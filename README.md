@@ -56,7 +56,7 @@ claude-md-templates/
 | セクション | 内容 |
 |---|---|
 | プロジェクト概要 | 名前と説明 |
-| プロジェクトフェーズ | INCUBATION → HATCHING → EMERGING → CRUISING の4段階 |
+| プロジェクトフェーズ | PROTOTYPE → ALPHA/BETA → PREVIEW → STABLE の4段階 |
 | 言語・ツール | 技術スタック・ビルドコマンド |
 | コーディング規約 | 言語固有のルール |
 | 開発フロー | Issue 駆動・worktree・squash merge |
