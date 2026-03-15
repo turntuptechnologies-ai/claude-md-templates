@@ -22,7 +22,7 @@ claude
 ```
 
 ```
-> /home/noto/workspace/my-project 用の CLAUDE.md を作って。
+> /path/to/my-project 用の CLAUDE.md を作って。
 > TypeScript + React + Express のWebアプリで、PostgreSQL を使います。
 ```
 
