@@ -24,8 +24,45 @@
 - パッケージマネージャ: npm (workspaces)
 - ビルド: `npm run build`
 - テスト: `npm test`
+- 統合テスト: `npm run test:integration`
 - リント: `npm run lint`
 - フォーマット: `npm run format`
+
+## アーキテクチャ概要
+
+### データフロー
+
+1. **リクエスト受信** — React フロントエンドから REST API / WebSocket でリクエスト
+2. **処理** — Express.js でビジネスロジックを実行、Prisma 経由で PostgreSQL にアクセス
+3. **リアルタイム通知** — タスク更新時に Socket.IO で関連ユーザーに即座に通知
+
+### 主要コンポーネント
+
+- **REST API**: タスク・プロジェクト・ユーザーの CRUD エンドポイント
+- **WebSocket サーバー**: リアルタイム通知（タスク更新・コメント追加等）
+- **認証ミドルウェア**: JWT ベースの認証・認可
+- **フロントエンド SPA**: React + React Router によるシングルページアプリケーション
+
+## ディレクトリ構成
+
+```
+packages/
+  frontend/
+    src/
+      components/        # React コンポーネント
+      hooks/             # カスタム hooks
+      pages/             # ページコンポーネント
+      services/          # API クライアント
+      types/             # フロントエンド固有の型定義
+  backend/
+    src/
+      routes/            # Express ルートハンドラ
+      middleware/         # 認証・バリデーション等
+      services/          # ビジネスロジック
+      prisma/            # Prisma スキーマ・マイグレーション
+  shared/
+    types/               # フロントエンド・バックエンド共有の型定義
+```
 
 ## コーディング規約
 
@@ -43,10 +80,50 @@
   - バックエンド: カスタムエラークラスを定義し、エラーハンドリングミドルウェアで一元処理する
   - フロントエンド: Error Boundary でクラッシュを防止する
 
+## テスト戦略
+
+### テストの種類と実行方法
+
+| 種類 | 対象 | 実行コマンド |
+|------|------|-------------|
+| 単体テスト | コンポーネント・ユーティリティ・サービス層 | `npm test` |
+| 統合テスト | API エンドポイント（DB 含む） | `npm run test:integration` |
+
+### テストファイルの配置
+
+- 単体テスト: 対象ファイルと同じディレクトリに `.test.ts` / `.test.tsx` サフィックス（例: `TaskList.tsx` → `TaskList.test.tsx`）
+- 統合テスト: `tests/integration/` ディレクトリに配置
+
+## コミットメッセージ規約
+
+[Conventional Commits](https://www.conventionalcommits.org/) に従う。
+
+```
+<type>: <description> (#<issue-number>)
+```
+
+### type 一覧
+
+| type | 用途 |
+|------|------|
+| `feat` | 新機能の追加 |
+| `fix` | バグ修正 |
+| `docs` | ドキュメントのみの変更 |
+| `test` | テストの追加・修正 |
+| `refactor` | リファクタリング（機能変更なし） |
+| `chore` | ビルド・CI・依存関係等の雑務 |
+
+### ルール
+
+- description は日本語で記述する
+- Issue 番号がある場合は末尾に `(#番号)` を付ける
+- squash merge 時の PR タイトルもこの規約に従う
+
 ## 開発フロー
 
 1. **Issue 作成** — コード・ドキュメント等の変更には必ず Issue を作成する
    - Issue のコメントに調査内容・試行錯誤・判断の経緯を記録する
+   - 他の Issue を参照するときは番号だけでなく説明を付けた箇条書きにする（例: `- #15 — タスクフィルタ機能`）
    - 適宜ラベルを付与する
    - `backlog` ラベル: 優先度が低く、通常の開発サイクルでは取り組まない Issue に付与する。「オープンの Issue に取り組んで」等の指示では `backlog` ラベルの Issue は対象外とする
 2. **設計** — 設計チームが要件整理・アーキテクチャ設計を行い、Issue に設計内容を記載する
@@ -105,6 +182,11 @@
 3. **ドキュメントの不足チェック** — 新機能・変更がドキュメントに反映されているか
 
 発見された問題は Issue 化して対応してから解散する。
+
+## デプロイ
+
+- 当面: VPS（Docker Compose）
+- 将来: クラウド PaaS への移行を視野に入れる
 
 ## Dependabot PR 対応方針
 

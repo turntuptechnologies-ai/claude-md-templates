@@ -25,6 +25,49 @@
 - リント: `cargo clippy -- -D warnings`
 - フォーマット: `cargo fmt --check`
 
+## アーキテクチャ概要
+
+### データフロー
+
+1. **コマンド解析** — clap でサブコマンド・引数を解析
+2. **ビジネスロジック** — タスクの CRUD 処理を実行
+3. **永続化** — SQLite にデータを保存・読み出し
+
+### 主要コンポーネント
+
+- **CLI パーサー**: clap によるコマンドライン引数解析
+- **タスクサービス**: タスクの作成・更新・削除・検索のビジネスロジック
+- **DB レイヤー**: rusqlite による SQLite アクセス
+
+## コマンド体系
+
+| コマンド | 説明 |
+|----------|------|
+| `taskflow add <title>` | タスクを作成 |
+| `taskflow list` | タスク一覧を表示（フィルタ・ソート対応） |
+| `taskflow done <id>` | タスクを完了にする |
+| `taskflow delete <id>` | タスクを削除する |
+| `taskflow edit <id>` | タスクを編集する |
+
+## ディレクトリ構成
+
+```
+src/
+  main.rs              # エントリポイント
+  lib.rs               # クレートルート
+  cli.rs               # clap によるコマンド定義
+  error.rs             # エラー型定義（thiserror）
+  db/
+    mod.rs             # DB アクセス層
+    migrations.rs      # マイグレーション
+  models/
+    task.rs            # タスクモデル
+  services/
+    task_service.rs    # ビジネスロジック
+tests/
+  integration_test.rs  # 統合テスト
+```
+
 ## コーディング規約
 
 - [Rust API Guidelines](https://rust-lang.github.io/api-guidelines/) に従う
@@ -36,15 +79,60 @@
   - 定数: `SCREAMING_SNAKE_CASE`
   - ライフタイム: 短い小文字 (`'a`, `'b`)
 - `unwrap()` / `expect()` はテストコードのみで使用し、本番コードでは `Result` / `Option` を適切に処理する
+  - **検査対象**: `src/` 配下の本番コード（`#[cfg(test)]` ブロック、`tests/`、`benches/` は対象外）
+  - **対象外（安全）**: `unwrap_or()`, `unwrap_or_default()`, `unwrap_or_else()` は適切なフォールバックがあるため対象外
+  - **要修正（パニックリスク）**: 外部入力のパース、ファイル I/O、DB クエリ結果の処理
+  - **許容（コメント必須）**: `Mutex::lock()`、正規表現リテラルの `Regex::new()`、初期化時の致命的エラー
+  - 許容する箇所には `// unwrap safety:` コメントで理由を明記する
 - `pub` の範囲は最小限にする
 - エラー型は `thiserror` で定義し、意味のあるエラーメッセージを付ける
 - ドキュメントコメント (`///`) は公開 API に必ず付ける
 - `unsafe` の使用は極力避け、使用する場合は `// SAFETY:` コメントで理由を明記する
 
+## テスト戦略
+
+### テストの種類と実行方法
+
+| 種類 | 対象 | 実行コマンド |
+|------|------|-------------|
+| 単体テスト | 各モジュールのロジック | `cargo test` |
+| 統合テスト | CLI コマンドの E2E 動作 | `cargo test --test integration_test` |
+
+### テストファイルの配置
+
+- 単体テスト: 同一ファイル内の `#[cfg(test)] mod tests` ブロック
+- 統合テスト: `tests/` ディレクトリ
+
+## コミットメッセージ規約
+
+[Conventional Commits](https://www.conventionalcommits.org/) に従う。
+
+```
+<type>: <description> (#<issue-number>)
+```
+
+### type 一覧
+
+| type | 用途 |
+|------|------|
+| `feat` | 新機能の追加 |
+| `fix` | バグ修正 |
+| `docs` | ドキュメントのみの変更 |
+| `test` | テストの追加・修正 |
+| `refactor` | リファクタリング（機能変更なし） |
+| `chore` | ビルド・CI・依存関係等の雑務 |
+
+### ルール
+
+- description は日本語で記述する
+- Issue 番号がある場合は末尾に `(#番号)` を付ける
+- squash merge 時の PR タイトルもこの規約に従う
+
 ## 開発フロー
 
 1. **Issue 作成** — コード・ドキュメント等の変更には必ず Issue を作成する
    - Issue のコメントに調査内容・試行錯誤・判断の経緯を記録する
+   - 他の Issue を参照するときは番号だけでなく説明を付けた箇条書きにする（例: `- #7 — 期日フィールドの追加`）
    - 適宜ラベルを付与する
    - `backlog` ラベル: 優先度が低く、通常の開発サイクルでは取り組まない Issue に付与する。「オープンの Issue に取り組んで」等の指示では `backlog` ラベルの Issue は対象外とする
 2. **設計** — 設計チームが要件整理・アーキテクチャ設計を行い、Issue に設計内容を記載する
