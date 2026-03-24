@@ -175,7 +175,7 @@ docs/                  # ドキュメント
 
 <!-- TypeScript/Deno の場合:
 - 単体テスト: 対象ファイルと同じディレクトリに `_test.ts` サフィックス（例: `auth.ts` → `auth_test.ts`）
-- 統合テスト: 対象ファイルと同じディレクトリに `_integration_test.ts` サフィックス（例: `iocs.ts` → `iocs_integration_test.ts`）
+- 統合テスト: 対象ファイルと同じディレクトリに `_integration_test.ts` サフィックス（例: `users.ts` → `users_integration_test.ts`）
 -->
 
 <!-- Rust の場合:
