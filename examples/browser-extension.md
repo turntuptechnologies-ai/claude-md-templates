@@ -263,6 +263,35 @@ WXT は `entrypoints/` ディレクトリ内のファイルを自動認識して
 - Chrome Web Store / Firefox Add-ons (AMO) への公開を想定
 - `pnpm zip` / `pnpm zip:firefox` で配布用 ZIP を生成する
 
+## サプライチェーンセキュリティ（pnpm）
+
+pnpm のセキュリティ機能を活用し、依存パッケージ経由の攻撃リスクを低減する。
+
+### ロックファイル
+
+- `pnpm-lock.yaml` は必ずリポジトリにコミットする
+- CI では `pnpm install --frozen-lockfile` を使い、ロックファイルと一致しない場合はエラーにする
+
+### postinstall スクリプトの制御
+
+- pnpm v10 ではデフォルトで依存パッケージの postinstall スクリプトが無効化されている
+- ネイティブバイナリのビルド等が必要なパッケージのみ `package.json` の `pnpm.allowBuilds` でホワイトリストに追加する
+- `pnpm.dangerouslyAllowAllBuilds` は使用禁止
+
+### 非標準ソースの依存の遮断
+
+- `package.json` に `pnpm.blockExoticSubdeps: true` を設定し、間接依存が Git リポジトリや tarball URL から引かれることを防止する
+
+### 新規公開パッケージの遅延インストール
+
+- `package.json` に `pnpm.minimumReleaseAge: "4320"` を設定し、公開から 3 日未満のバージョンをインストールしない
+- 悪意あるパッケージは公開後すぐに検出されることが多いため、遅延によりリスクを回避する
+- 緊急のセキュリティパッチ等で即時更新が必要な場合は一時的に設定を解除して対応する
+
+### 信頼ポリシー
+
+- `package.json` に `pnpm.trustPolicy: "no-downgrade"` を設定し、provenance（出所証明）の信頼レベルが下がったバージョンのインストールを防止する
+
 ## ライセンスルール
 
 - GPL 系ライセンスの依存パッケージは使用禁止（商用転用の可能性があるため）
