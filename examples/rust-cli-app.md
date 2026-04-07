@@ -193,11 +193,40 @@ tests/
 
 発見された問題は Issue 化して対応してから解散する。
 
+## サプライチェーンセキュリティ（Cargo）
+
+依存クレート経由の攻撃リスクを低減するため、以下のツールと運用ルールを適用する。
+
+### ロックファイル
+
+- `Cargo.lock` は必ずリポジトリにコミットする
+- CI では `cargo build --locked` / `cargo test --locked` を使い、ロックファイルと一致しない場合はエラーにする
+
+### cargo-deny による依存チェック
+
+[cargo-deny](https://github.com/EmbarkStudios/cargo-deny) を導入し、CI で `cargo deny check` を実行する。
+
+設定ファイル `deny.toml` で以下を管理する:
+
+- **`[licenses]`** — 許可するライセンスをホワイトリストで指定する（MIT, Apache-2.0, BSD 系等）
+- **`[advisories]`** — RustSec Advisory DB と照合し、既知の脆弱性があるクレートを検出する
+- **`[sources]`** — 依存クレートの取得元を crates.io に限定し、Git リポジトリや未知のレジストリからの取得を禁止する
+- **`[bans]`** — 使用を禁止するクレートや、同一クレートの重複バージョンを検出する
+
+### cargo-vet による監査（推奨）
+
+[cargo-vet](https://github.com/mozilla/cargo-vet) の導入を推奨する。信頼できるエンティティが監査済みのクレートのみを使用する運用により、未監査の依存が混入するリスクを低減できる。
+
+### 依存追加時のルール
+
+- 新しいクレートを追加する際は `cargo deny check` が通ることを確認する
+- 依存は最小限にし、不要になったクレートは速やかに削除する
+
 ## ライセンスルール
 
 - GPL 系ライセンスの依存クレートは使用禁止（商用転用の可能性があるため）
 - 許可: MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC, Zlib 等の permissive ライセンス
-- 依存追加時はライセンスを必ず確認する
+- `deny.toml` の `[licenses]` で許可リストを管理し、CI で自動チェックする
 
 ## 環境ルール
 
