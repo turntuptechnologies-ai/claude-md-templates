@@ -143,7 +143,7 @@ packages/
 
 | チーム | メンバー | 役割 |
 |--------|----------|------|
-| 設計 | designer | 要件整理・アーキテクチャ設計・Issue 作成 |
+| 設計 | architect | 要件整理・アーキテクチャ設計・Issue 作成 |
 | レビュー | reviewer | 設計の妥当性チェック・PR のコードレビュー |
 | 実装 | developer, developer2 | コーディング・commit・PR 作成 |
 | テスト | tester | テストコード作成・品質検証 |
@@ -157,7 +157,7 @@ packages/
 
 - **Issue ごとにチームを作成する** — 関連する Issue をまとめて 1 チームで対応してもよい
 - **チーム構成は以下の順で進行する**:
-  1. 設計（designer） — 要件整理・アーキテクチャ設計
+  1. 設計（architect） — 要件整理・アーキテクチャ設計
   2. レビュー（reviewer） — 設計の妥当性チェック
   3. 実装（developer / developer2） — コーディング・commit・PR 作成
   4. テスト（tester） — テストコード作成・品質検証
