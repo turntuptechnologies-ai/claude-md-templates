@@ -4,6 +4,16 @@ Claude Code で使う `CLAUDE.md` のテンプレート集です。
 
 Agent Teams 対応のチーム体制・開発フローを含む、実践的なテンプレートを提供します。
 
+> [!IMPORTANT]
+> テンプレートの継続メンテナンスは [turntuptechnologies-ai/skills](https://github.com/turntuptechnologies-ai/skills) の **`new-project-init` Skill に統合しました**。プラグイン（`turntup`）として導入すると、CLAUDE.md テンプレに加えて Rules（常時制約）・main 保護フック・関連 Skill 群（`run-agent-team` / `dependency-update` 等）までまとめて手に入ります。
+>
+> ```
+> /plugin marketplace add turntuptechnologies-ai/skills
+> /plugin install turntup@turntup-skills
+> ```
+>
+> 本リポジトリは、プラグインを使わず **CLAUDE.md 単体で始めたい人向けのスタンドアロン版**として維持します。依存更新やチーム進行などの「手順」はプラグイン側の Skill が最新です。
+
 ## 使い方
 
 ### Claude Code で自動生成する（推奨）
@@ -46,7 +56,8 @@ claude-md-templates/
 │   └── agent-teams.md           # Agent Teams 用テンプレート
 └── examples/
     ├── typescript-web-app.md    # 記入済みの例（TypeScript + React + Express）
-    └── rust-cli-app.md          # 記入済みの例（Rust CLI）
+    ├── rust-cli-app.md          # 記入済みの例（Rust CLI）
+    └── browser-extension.md     # 記入済みの例（WXT ブラウザ拡張）
 ```
 
 ## テンプレートの内容
@@ -59,9 +70,7 @@ claude-md-templates/
 | プロジェクトフェーズ | PROTOTYPE → ALPHA/BETA → PREVIEW → STABLE の4段階 |
 | 言語・ツール | 技術スタック・ビルドコマンド |
 | コーディング規約 | 言語固有のルール |
-| 開発フロー | Issue 駆動・worktree・squash merge |
-| チーム解散前チェック | 設計乖離・テスト不足・ドキュメント不足 |
-| Dependabot 対応 | 緊急度別の対応方針（オプション） |
+| 開発フロー | Issue 駆動・ブランチ運用・squash merge |
 | ライセンスルール | 依存ライブラリのライセンス方針 |
 | 環境ルール | 実行環境の制約 |
 | 言語ルール | 自然言語の記述言語 |
@@ -70,6 +79,7 @@ claude-md-templates/
 
 | セクション | 内容 |
 |---|---|
-| チーム体制 | 設計・レビュー・実装・テスト・ドキュメントの5チーム |
+| チーム体制 | 設計（architect）・レビュー・実装・テスト・ドキュメントの5チーム |
 | 作業方式 | TeamCreate + tmux 並行作業 |
 | 基本ルール | 進行順序・依存関係・記録方針 |
+| チーム解散前チェック | 設計乖離・テスト不足・ドキュメント不足（実装非関与のメンバーが検証） |
